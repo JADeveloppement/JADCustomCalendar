@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Locale;
 
 import fr.jadeveloppement.jadcalendar.components.DayComponent;
-import fr.jadeveloppement.jadcalendar.components.DaysInMonthComponent;
 import fr.jadeveloppement.jadcalendar.components.DaysShortNamesComponents;
 import fr.jadeveloppement.jadcalendar.components.MonthComponent;
 import fr.jadeveloppement.jadcalendar.components.WeekComponent;
