@@ -276,8 +276,6 @@ DayComponent.DayClicked {
     private View customCalendarLayout, calendarMonthLayout, calendarDaysShortLayout, calendarDaysLayout_v2;
     private LinearLayout calendarMonthLayoutContainer, layoutCustomCalendarShortDaysContainer, layoutCustomCalendarDaysContainer;
 
-    // test
-
     /**
      * Initializes calendar with a callback function when you click on a day
      * @param c : context of the application
