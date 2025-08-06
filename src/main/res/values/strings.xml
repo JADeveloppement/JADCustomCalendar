@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="prevMonth"><![CDATA[<]]></string>
+    <string name="nextMonth"><![CDATA[>]]></string>
+</resources>
