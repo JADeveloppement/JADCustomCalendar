@@ -1,4 +1,4 @@
-package fr.jadeveloppement.jadcalendar.components;
+package fr.jadeveloppement.jadcustomcalendar.components;
 
 import android.content.Context;
 import android.util.Log;
@@ -10,7 +10,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
-import fr.jadeveloppement.jadcalendar.Variables;
+import fr.jadeveloppement.jadcustomcalendar.Variables;
 import fr.jadeveloppement.jadcustomcalendar.R;
 
 public class DaysShortNamesComponents {
