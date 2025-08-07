@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <dimen name="paddingL">16dp</dimen>
-    <dimen name="paddingM">8dp</dimen>
-    <dimen name="paddingS">4dp</dimen>
-    <string name="nextMonth"><![CDATA[>]]></string>
-    <string name="prevMonth"><![CDATA[<]]></string>
-</resources>
