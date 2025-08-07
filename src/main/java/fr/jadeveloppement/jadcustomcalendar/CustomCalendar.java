@@ -4,13 +4,13 @@ import static java.lang.Integer.parseInt;
 import static java.util.Objects.isNull;
 
 import android.content.Context;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.TextView;
+
+import androidx.annotation.NonNull;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -27,19 +27,118 @@ import fr.jadeveloppement.jadcustomcalendar.components.DaysShortNamesComponents;
 import fr.jadeveloppement.jadcustomcalendar.components.MonthComponent;
 import fr.jadeveloppement.jadcustomcalendar.components.WeekComponent;
 
-public class CustomCalendar extends LinearLayout implements MonthComponent.MonthLayoutClicked,
-DayComponent.DayClicked {
+public class CustomCalendar extends LinearLayout implements
+        MonthComponent.MonthLayoutClicked, DayComponent.DayClicked {
 
-    private final String TAG = "Agenda";
+    private final String TAG = "JADCustomCalendar";
     private DateChanged listener;
     private DayComponent selectedDayComponent = null;
-    private final Context context;
-    private TextView btnSetToday;
+    private Context context;
     private String selectedDay;
+    private LinearLayout layoutCustomCalendarDaysContainer;
+    private MonthComponent monthComponent;
 
     public interface DateChanged {
         void selectedDayChanged();
     }
+
+    /**
+     * Initializes calendar : no action available with this public constructor
+     * @param c : context of the application
+     */
+    public CustomCalendar(@NonNull Context c){
+        super(c);
+        this.context = c;
+
+        initVariables();
+        initCalendar();
+    }
+
+    public CustomCalendar(@NonNull Context c, DateChanged l){
+        super(c);
+        this.context = c;
+        this.listener = l;
+
+        initVariables();
+        initCalendar();
+    }
+
+    public CustomCalendar(Context c, AttributeSet attrs) {
+        super(c, attrs);
+        this.context = c;
+
+        initVariables();
+        initCalendar();
+    }
+
+    public CustomCalendar(Context c, AttributeSet attrs, int defStyleAttr) {
+        super(c, attrs, defStyleAttr);
+        this.context = c;
+
+        initVariables();
+        initCalendar();
+    }
+
+    private void initVariables(){
+        this.selectedDay = getTodayDate();
+    }
+
+    private void initCalendar() {
+        LayoutInflater.from(context).inflate(R.layout.layout_custom_calendar, this, true);
+
+        LinearLayout calendarMonthLayoutContainer = findViewById(R.id.layoutCustomCalendarMonthContainer);
+        LinearLayout layoutCustomCalendarShortDaysContainer = findViewById(R.id.layoutCustomCalendarShortDaysContainer);
+        this.layoutCustomCalendarDaysContainer = findViewById(R.id.layoutCustomCalendarDaysContainer);
+
+        monthComponent = new MonthComponent(context, selectedDay.substring(0, 7), calendarMonthLayoutContainer, this);
+        calendarMonthLayoutContainer.addView(monthComponent.getLayout());
+
+        DaysShortNamesComponents daysShortNamesComponents = new DaysShortNamesComponents(context, layoutCustomCalendarShortDaysContainer);
+        layoutCustomCalendarShortDaysContainer.addView(daysShortNamesComponents.getLayout());
+
+        setDaysLayout();
+    }
+
+    private void setDaysLayout(){
+        layoutCustomCalendarDaysContainer.removeAllViews();
+        int daysOfMonth = getDaysInMonth(getYear() + "-" + getMonth() + "-01");
+        int firstDayOfWeek = getDayOfWeekIndex(getYear() + "-" + getMonth() + "-01");
+
+        int dayOfMonth = 1;
+
+        for (int week = 0; week < (int) Math.ceil((firstDayOfWeek + daysOfMonth) / 7.0); week++) {
+            List<DayComponent> daysComponentList = new ArrayList<>();
+            for (int dayOfWeek = 0; dayOfWeek < 7; dayOfWeek++) {
+                DayComponent dayComponent = new DayComponent(context, layoutCustomCalendarDaysContainer, this);
+                if ((week == 0 && dayOfWeek >= firstDayOfWeek) || (week > 0 && dayOfMonth <= daysOfMonth)){
+                    String dayOfMonthStr = dayOfMonth < 10 ? "0" + dayOfMonth : String.valueOf(dayOfMonth);
+                    String dateOfComponent = getYear() + "-" + getMonth() + "-" + dayOfMonthStr;
+
+                    dayComponent.setDayDate(dateOfComponent);
+
+                    if (dateOfComponent.equalsIgnoreCase(selectedDay)){
+                        dayComponent.setActive(true);
+                        selectedDayComponent = dayComponent;
+                    }
+
+                    dayOfMonth++;
+                }
+                daysComponentList.add(dayComponent);
+            }
+            WeekComponent weekComponent = new WeekComponent(context, daysComponentList, layoutCustomCalendarDaysContainer);
+            layoutCustomCalendarDaysContainer.addView(weekComponent.getLayout());
+        }
+    }
+
+    public void setListener(DateChanged l){
+        this.listener = l;
+    }
+
+    private int getDpInPx(Context c, int dp) {
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, c.getResources().getDisplayMetrics());
+    }
+
+    // Basic date manipulation methods
 
     /**
      * get selected day of the calendar
@@ -64,118 +163,6 @@ DayComponent.DayClicked {
     public String getYear(){
         return selectedDay.split("-")[0];
     }
-
-    /**
-     * Initializes calendar : no action available with this public constructor
-     * @param c : context of the application
-     */
-    public CustomCalendar(Context c){
-        super(c);
-        this.context = c.getApplicationContext();
-
-        initVariables();
-    }
-
-    private View customCalendarLayout, calendarDaysShortLayout;
-    private LinearLayout calendarMonthLayoutContainer, layoutCustomCalendarShortDaysContainer, layoutCustomCalendarDaysContainer;
-
-    private MonthComponent monthComponent;
-    private DaysShortNamesComponents daysShortNamesComponents;
-
-    /**
-     * Initializes calendar with a callback function when you click on a day
-     * @param c : context of the application
-     * @param r : callback to run when day is clicked
-     */
-    public CustomCalendar(Context c, Runnable r){
-        super(c);
-        this.context = c;
-        this.customCalendarLayout = LayoutInflater.from(context).inflate(R.layout.layout_custom_calendar, this, false);
-
-        this.calendarMonthLayoutContainer = customCalendarLayout.findViewById(R.id.layoutCustomCalendarMonthContainer);
-        this.layoutCustomCalendarShortDaysContainer = customCalendarLayout.findViewById(R.id.layoutCustomCalendarShortDaysContainer);
-        this.layoutCustomCalendarDaysContainer = customCalendarLayout.findViewById(R.id.layoutCustomCalendarDaysContainer);
-        this.calendarDaysShortLayout = LayoutInflater.from(context).inflate(R.layout.layout_days_short, (ViewGroup) customCalendarLayout, false);
-
-        initVariables();
-        initCalendar();
-    }
-
-    public CustomCalendar(Context c, DateChanged l){
-        super(c);
-        this.context = c;
-        this.customCalendarLayout = LayoutInflater.from(context).inflate(R.layout.layout_custom_calendar, this, false);
-
-        this.calendarMonthLayoutContainer = customCalendarLayout.findViewById(R.id.layoutCustomCalendarMonthContainer);
-        this.layoutCustomCalendarShortDaysContainer = customCalendarLayout.findViewById(R.id.layoutCustomCalendarShortDaysContainer);
-        this.layoutCustomCalendarDaysContainer = customCalendarLayout.findViewById(R.id.layoutCustomCalendarDaysContainer);
-        this.listener = l;
-
-        initVariables();
-        initCalendar();
-    }
-
-    private void initVariables(){
-        this.selectedDay = getTodayDate();
-    }
-
-    private void initCalendar() {
-        monthComponent = new MonthComponent(context, selectedDay.substring(0, 7), calendarMonthLayoutContainer, this);
-        calendarMonthLayoutContainer.addView(monthComponent.getLayout());
-
-        daysShortNamesComponents = new DaysShortNamesComponents(context, (ViewGroup) calendarDaysShortLayout);
-        layoutCustomCalendarShortDaysContainer.addView(daysShortNamesComponents.getLayout());
-    }
-
-    public View getCustomCalendarLayout(){
-        setDaysLayout();
-        return customCalendarLayout;
-    }
-
-    private void setDaysLayout(){
-        layoutCustomCalendarDaysContainer.removeAllViews();
-        int daysOfMonth = getDaysInMonth(getYear() + "-" + getMonth() + "-01");
-        int firstDayOfWeek = getDayOfWeekIndex(getYear() + "-" + getMonth() + "-01");
-
-        int dayOfMonth = 1;
-
-        for (int week = 0; week < (int) Math.ceil((firstDayOfWeek + daysOfMonth) / 7.0); week++) {
-            List<DayComponent> daysComponentList = new ArrayList<>();
-            for (int dayOfWeek = 0; dayOfWeek < 7; dayOfWeek++) {
-                DayComponent dayComponent = new DayComponent(context, layoutCustomCalendarDaysContainer, this);
-                if ((week == 0 && dayOfWeek >= firstDayOfWeek) || (week > 0 && dayOfMonth <= daysOfMonth)){
-                    String dayOfMonthStr = dayOfMonth < 10 ? "0" + dayOfMonth : String.valueOf(dayOfMonth);
-                    String dateOfComponent = getYear() + "-" + getMonth() + "-" + dayOfMonthStr;
-
-                    dayComponent.setDayDate(dateOfComponent);
-
-                    if (dateOfComponent.equalsIgnoreCase(selectedDay)){
-                        selectedDayComponent = dayComponent;
-                        dayComponent.setActive(true);
-                    }
-
-                    dayOfMonth++;
-                }
-                daysComponentList.add(dayComponent);
-            }
-            WeekComponent weekComponent = new WeekComponent(context, daysComponentList, layoutCustomCalendarDaysContainer);
-            layoutCustomCalendarDaysContainer.addView(weekComponent.getLayout());
-        }
-    }
-
-    /**
-     * Return a clickable textview to select the today date
-     * @return : clickable textview
-     */
-    public TextView getButtonTodayLayout(){
-        return btnSetToday;
-    }
-
-    private int getDpInPx(Context c, int dp) {
-        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, c.getResources().getDisplayMetrics());
-    }
-
-    // Basic date manipulation methods
 
     /**
      * Get the week's number of the selected date
@@ -307,8 +294,6 @@ DayComponent.DayClicked {
         if (!isNull(monthComponent))
             monthComponent.updateMonthName(selectedDay.substring(0, 7));
 
-        setDaysLayout();
-
         if (!isNull(listener)) listener.selectedDayChanged();
     }
 
@@ -371,9 +356,8 @@ DayComponent.DayClicked {
      * @param i : interval to add (day, week, month, year)
      * @return : new selectedDate
      */
-    public String addInterval(int incr, String i){
+    public void addInterval(int incr, String i){
         String interval = i.toLowerCase();
-        String newDate = "";
         switch(interval){
             case "day":
             case "days":
@@ -395,8 +379,6 @@ DayComponent.DayClicked {
                 // empty default
                 break;
         }
-
-        return newDate;
     }
 
     @Override
