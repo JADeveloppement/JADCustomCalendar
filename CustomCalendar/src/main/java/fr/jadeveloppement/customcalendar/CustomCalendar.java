@@ -1,4 +1,4 @@
-package fr.jadeveloppement.jadcalendar.customcalendar ;
+package fr.jadeveloppement.jadcustomcalendar.customcalendar ;
 
 class CustomCalendar extends LinearLayout {
     private final Context context;

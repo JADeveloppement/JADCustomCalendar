@@ -1,10 +1,9 @@
-package fr.jadeveloppement.jadcalendar.components;
+package fr.jadeveloppement.jadcustomcalendar.components;
 
 import static java.lang.Integer.parseInt;
 import static java.util.Objects.isNull;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,7 +13,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
-import fr.jadeveloppement.jadcalendar.Variables;
+import fr.jadeveloppement.jadcustomcalendar.Variables;
 import fr.jadeveloppement.jadcustomcalendar.R;
 
 public class MonthComponent {
