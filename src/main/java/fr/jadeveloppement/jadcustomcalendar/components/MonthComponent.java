@@ -109,6 +109,10 @@ public class MonthComponent {
         setMonthName();
     }
 
+    public String getMonthName(){
+        return monthDate;
+    }
+
     public LinearLayout getNextMonthLayout(){
         return nextMonthLayout;
     }

@@ -37,7 +37,10 @@ public class CustomCalendar extends LinearLayout implements
     private String selectedDay;
     private LinearLayout layoutCustomCalendarDaysContainer;
     private MonthComponent monthComponent;
+    private List<DayComponent> daysComponentList, daysComponentActuallyDisplayed;
+    private List<String> daysActuallyDisplayed;
     private boolean monthChanged = false;
+    private boolean addXWeekClicked = false;
 
     public interface DateChanged {
         void selectedDayChanged();
@@ -101,13 +104,15 @@ public class CustomCalendar extends LinearLayout implements
 
     private void setDaysLayout(){
         layoutCustomCalendarDaysContainer.removeAllViews();
+        daysActuallyDisplayed = new ArrayList<>();
+        daysComponentActuallyDisplayed = new ArrayList<>();
         int daysOfMonth = getDaysInMonth(getYear() + "-" + getMonth() + "-01");
         int firstDayOfWeek = getDayOfWeekIndex(getYear() + "-" + getMonth() + "-01");
 
         int dayOfMonth = 1;
 
         for (int week = 0; week < (int) Math.ceil((firstDayOfWeek + daysOfMonth) / 7.0); week++) {
-            List<DayComponent> daysComponentList = new ArrayList<>();
+            daysComponentList = new ArrayList<>();
             for (int dayOfWeek = 0; dayOfWeek < 7; dayOfWeek++) {
                 DayComponent dayComponent = new DayComponent(context, layoutCustomCalendarDaysContainer, this);
                 if ((week == 0 && dayOfWeek >= firstDayOfWeek) || (week > 0 && dayOfMonth <= daysOfMonth)){
@@ -115,6 +120,8 @@ public class CustomCalendar extends LinearLayout implements
                     String dateOfComponent = getYear() + "-" + getMonth() + "-" + dayOfMonthStr;
 
                     dayComponent.setDayDate(dateOfComponent);
+                    daysActuallyDisplayed.add(dateOfComponent);
+                    daysComponentActuallyDisplayed.add(dayComponent);
 
                     if (dateOfComponent.equalsIgnoreCase(selectedDay)){
                         dayComponent.setActive(true);
@@ -291,13 +298,28 @@ public class CustomCalendar extends LinearLayout implements
     public void setDaySelected(String dayS){
         selectedDay = dayS;
 
-        if (!isNull(monthComponent))
+        if (!isNull(monthComponent) && !monthComponent.getMonthName().equalsIgnoreCase(selectedDay.substring(0, 7))){
             monthComponent.updateMonthName(selectedDay.substring(0, 7));
+            monthChanged = true;
+        }
 
         if (monthChanged){
             monthChanged = false;
             setDaysLayout();
         }
+
+        if (addXWeekClicked){
+            addXWeekClicked = false;
+            selectedDayComponent.setActive(false);
+            String[] date = getWeekRange();
+            int indexOfDayToSelect = daysActuallyDisplayed.indexOf(date[0]);
+            DayComponent dayComponentSelected = daysComponentActuallyDisplayed.get(indexOfDayToSelect == -1 ? 0 : indexOfDayToSelect);
+            if (!isNull(dayComponentSelected)){
+                dayComponentSelected.setActive(true);
+                selectedDayComponent = dayComponentSelected;
+            }
+        }
+
 
         if (!isNull(listener)) listener.selectedDayChanged();
     }
@@ -329,6 +351,7 @@ public class CustomCalendar extends LinearLayout implements
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate date = LocalDate.parse(selectedDay, formatter);
         LocalDate newDate = date.plusDays((long) 7*x);
+        addXWeekClicked = true;
         setDaySelected(newDate.format(formatter));
     }
 
