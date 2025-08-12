@@ -48,39 +48,38 @@ public class CustomCalendar extends LinearLayout implements
      */
     public CustomCalendar(@NonNull Context c){
         super(c);
-        this.context = c;
 
-        initVariables();
-        initCalendar();
+        init(c, null);
     }
 
     public CustomCalendar(@NonNull Context c, DateChanged l){
         super(c);
-        this.context = c;
-        this.listener = l;
 
-        initVariables();
-        initCalendar();
+        init(c, l);
     }
 
     public CustomCalendar(Context c, AttributeSet attrs) {
         super(c, attrs);
-        this.context = c;
 
-        initVariables();
-        initCalendar();
+        init(c, null);
     }
 
     public CustomCalendar(Context c, AttributeSet attrs, int defStyleAttr) {
         super(c, attrs, defStyleAttr);
-        this.context = c;
 
-        initVariables();
-        initCalendar();
+        init(c, null);
     }
 
     private void initVariables(){
         this.selectedDay = getTodayDate();
+    }
+
+    private void init(Context c, DateChanged l) {
+        this.listener = l;
+        this.context = c;
+
+        initVariables();
+        initCalendar();
     }
 
     private void initCalendar() {
@@ -351,7 +350,7 @@ public class CustomCalendar extends LinearLayout implements
     }
 
     /**
-     * Add an interval to a date string
+     * Add an interval to the selected date from the calendar
      * @param incr : number to add
      * @param i : interval to add (day, week, month, year)
      * @return : new selectedDate
