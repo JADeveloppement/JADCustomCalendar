@@ -37,6 +37,7 @@ public class CustomCalendar extends LinearLayout implements
     private String selectedDay;
     private LinearLayout layoutCustomCalendarDaysContainer;
     private MonthComponent monthComponent;
+    private boolean monthChanged = false;
 
     public interface DateChanged {
         void selectedDayChanged();
@@ -293,6 +294,11 @@ public class CustomCalendar extends LinearLayout implements
         if (!isNull(monthComponent))
             monthComponent.updateMonthName(selectedDay.substring(0, 7));
 
+        if (monthChanged){
+            monthChanged = false;
+            setDaysLayout();
+        }
+
         if (!isNull(listener)) listener.selectedDayChanged();
     }
 
@@ -383,13 +389,13 @@ public class CustomCalendar extends LinearLayout implements
     @Override
     public void prevMonthClicked() {
         addInterval(-1, "month");
-        if (!isNull(listener)) listener.selectedDayChanged();
+        monthChanged = true;
     }
 
     @Override
     public void nextMonthClicked() {
         addInterval(1, "month");
-        if (!isNull(listener)) listener.selectedDayChanged();
+        monthChanged = true;
     }
 
     @Override
