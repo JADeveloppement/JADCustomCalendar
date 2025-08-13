@@ -3,7 +3,11 @@ package fr.jadeveloppement.jadcustomcalendar.components;
 import static java.util.Objects.isNull;
 
 import android.content.Context;
+import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.graphics.Typeface;
+import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,31 +21,15 @@ import fr.jadeveloppement.jadcustomcalendar.R;
 
 public class DayComponent {
 
-    private int DAY_ACTIVE_BG = 0;
-    private int DAY_ACTIVE_COLOR = Variables.getColor(Variables.CalendarColor.ORANGE);
+    private boolean HAS_DELIMITER = false;
+    private int ACTIVE_DAY_BG = 0;
+    private int ACTIVE_DAY_COLOR = 0;
     private DayClicked listener;
     private View dayLayout;
-
     private final Context context;
     private String dayDate = "";
     private TextView dayTv;
     private LinearLayout dayLayoutContainer;
-
-    public void setActiveColor(int activeDayColor) {
-        this.DAY_ACTIVE_COLOR = activeDayColor;
-    }
-
-    public int getActiveColor(){
-        return this.DAY_ACTIVE_COLOR;
-    }
-
-    public void setActiveBackground(int activeDayBg) {
-        this.DAY_ACTIVE_BG = activeDayBg;
-    }
-
-    public int getActiveBackground(){
-        return this.DAY_ACTIVE_BG;
-    }
 
     public interface DayClicked {
         void dayClicked(String newDate, DayComponent component);
@@ -51,10 +39,21 @@ public class DayComponent {
         this.context = c;
     }
 
-    public DayComponent(@NonNull Context c, @NonNull ViewGroup parent, DayClicked l){
+    public DayComponent(@NonNull Context c, @NonNull ViewGroup parent, DayClicked l, AttributeSet attrS, Integer defStyleA){
         this.context = c;
         this.dayLayout = LayoutInflater.from(context).inflate(R.layout.layout_calendar_day, parent, false);
         this.listener = l;
+
+        if (!isNull(attrS)){
+            TypedArray customStyle = context.obtainStyledAttributes(attrS, R.styleable.CustomCalendar, defStyleA, 0);
+            try {
+                ACTIVE_DAY_COLOR = customStyle.getColor(R.styleable.CustomCalendar_calendarDaySelectedColor, Color.parseColor("#FFA500"));
+                ACTIVE_DAY_BG = customStyle.getResourceId(R.styleable.CustomCalendar_calendarDaySelectedBackground, 0);
+                HAS_DELIMITER = customStyle.getBoolean(R.styleable.CustomCalendar_calendarDisplayDelimiters, false);
+            } finally {
+                customStyle.recycle();
+            }
+        }
 
         initDay();
     }
@@ -69,6 +68,8 @@ public class DayComponent {
         dayTv = dayLayout.findViewById(R.id.layoutCustomCalendarDayTv);
         dayLayoutContainer = dayLayout.findViewById(R.id.layoutCustomCalendarDayLayout);
 
+        if (HAS_DELIMITER) dayLayout.setBackgroundResource(R.drawable.delimiters);
+
         dayLayout.setOnClickListener(v -> {
             if (!isNull(listener) && !this.dayDate.isBlank()) listener.dayClicked(this.dayDate, this);
         });
@@ -76,8 +77,8 @@ public class DayComponent {
 
     public void setActive(boolean isActive) {
         if (!isNull(dayLayout)) {
-            if (DAY_ACTIVE_BG != 0) dayLayout.setBackgroundResource(isActive ? DAY_ACTIVE_BG : 0);
-            else dayLayout.setBackgroundColor(isActive ? getActiveColor() : Variables.getColor(Variables.CalendarColor.TRANSPARENT));
+            if (ACTIVE_DAY_BG != 0) dayLayout.setBackgroundResource(isActive ? ACTIVE_DAY_BG : 0);
+            else dayLayout.setBackgroundColor(isActive ? ACTIVE_DAY_COLOR : Variables.getColor(Variables.CalendarColor.TRANSPARENT));
         }
         if (!isNull(dayTv)){
             dayTv.setTypeface(isActive ? Typeface.DEFAULT_BOLD : Typeface.DEFAULT);

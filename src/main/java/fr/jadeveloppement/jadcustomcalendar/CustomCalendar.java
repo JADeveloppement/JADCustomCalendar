@@ -41,9 +41,8 @@ public class CustomCalendar extends LinearLayout implements
     private MonthComponent monthComponent;
     private List<DayComponent> daysComponentList, daysComponentActuallyDisplayed;
     private List<String> daysActuallyDisplayed;
-
-    private int ACTIVE_DAY_COLOR = Color.parseColor("#FFA500");
-    private int ACTIVE_DAY_BG;
+    private AttributeSet attributeSet = null;
+    private Integer defStyleAttribute = null;
 
     public interface DateChanged {
         void selectedDayChanged();
@@ -84,16 +83,8 @@ public class CustomCalendar extends LinearLayout implements
     private void init(Context c, AttributeSet attrS, int defStyleAttr, DateChanged l) {
         this.listener = l;
         this.context = c;
-
-        if (!isNull(attrS)){
-            TypedArray typedArray = context.obtainStyledAttributes(attrS, R.styleable.CustomCalendar, defStyleAttr, 0);
-            try {
-                ACTIVE_DAY_COLOR = typedArray.getColor(R.styleable.CustomCalendar_calendarDaySelectedColor, ACTIVE_DAY_COLOR);
-                ACTIVE_DAY_BG = typedArray.getResourceId(R.styleable.CustomCalendar_calendarDaySelectedBackground, 0);
-            } finally {
-                typedArray.recycle();
-            }
-        }
+        this.attributeSet = attrS;
+        this.defStyleAttribute = defStyleAttr;
 
         initVariables();
         initCalendar();
@@ -127,9 +118,7 @@ public class CustomCalendar extends LinearLayout implements
         for (int week = 0; week < (int) Math.ceil((firstDayOfWeek + daysOfMonth) / 7.0); week++) {
             daysComponentList = new ArrayList<>();
             for (int dayOfWeek = 0; dayOfWeek < 7; dayOfWeek++) {
-                DayComponent dayComponent = new DayComponent(context, layoutCustomCalendarDaysContainer, this);
-                dayComponent.setActiveColor(ACTIVE_DAY_COLOR);
-                dayComponent.setActiveBackground(ACTIVE_DAY_BG);
+                DayComponent dayComponent = new DayComponent(context, layoutCustomCalendarDaysContainer, this, this.attributeSet, this.defStyleAttribute);
                 if ((week == 0 && dayOfWeek >= firstDayOfWeek) || (week > 0 && dayOfMonth <= daysOfMonth)){
                     String dayOfMonthStr = dayOfMonth < 10 ? "0" + dayOfMonth : String.valueOf(dayOfMonth);
                     String dateOfComponent = getYear() + "-" + getMonth() + "-" + dayOfMonthStr;
@@ -156,8 +145,11 @@ public class CustomCalendar extends LinearLayout implements
         this.listener = l;
     }
 
-    private int getDpInPx(Context c, int dp) {
-        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, c.getResources().getDisplayMetrics());
+    public void putBadgeToDates(String[] dates){
+        for(String date : dates){
+            int indexOfDay = daysActuallyDisplayed.indexOf(date);
+
+        }
     }
 
     // Basic date manipulation methods
