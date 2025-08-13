@@ -17,6 +17,8 @@ import fr.jadeveloppement.jadcustomcalendar.R;
 
 public class DayComponent {
 
+    private int DAY_ACTIVE_BG = 0;
+    private int DAY_ACTIVE_COLOR = Variables.getColor(Variables.CalendarColor.ORANGE);
     private DayClicked listener;
     private View dayLayout;
 
@@ -24,6 +26,22 @@ public class DayComponent {
     private String dayDate = "";
     private TextView dayTv;
     private LinearLayout dayLayoutContainer;
+
+    public void setActiveColor(int activeDayColor) {
+        this.DAY_ACTIVE_COLOR = activeDayColor;
+    }
+
+    public int getActiveColor(){
+        return this.DAY_ACTIVE_COLOR;
+    }
+
+    public void setActiveBackground(int activeDayBg) {
+        this.DAY_ACTIVE_BG = activeDayBg;
+    }
+
+    public int getActiveBackground(){
+        return this.DAY_ACTIVE_BG;
+    }
 
     public interface DayClicked {
         void dayClicked(String newDate, DayComponent component);
@@ -57,7 +75,10 @@ public class DayComponent {
     }
 
     public void setActive(boolean isActive) {
-        if (!isNull(dayLayout)) dayLayout.setBackgroundColor(isActive ? Variables.getColor(Variables.CalendarColor.ORANGE) : Variables.getColor(Variables.CalendarColor.TRANSPARENT));
+        if (!isNull(dayLayout)) {
+            if (DAY_ACTIVE_BG != 0) dayLayout.setBackgroundResource(isActive ? DAY_ACTIVE_BG : 0);
+            else dayLayout.setBackgroundColor(isActive ? getActiveColor() : Variables.getColor(Variables.CalendarColor.TRANSPARENT));
+        }
         if (!isNull(dayTv)){
             dayTv.setTypeface(isActive ? Typeface.DEFAULT_BOLD : Typeface.DEFAULT);
             dayTv.setTextColor(isActive ? Variables.getColor(Variables.CalendarColor.WHITE) : Variables.getColor(Variables.CalendarColor.BLACK));

@@ -29,7 +29,6 @@ dependencies {
 
     testImplementation(libs.junit)
     testImplementation(libs.junit.jupiter)
-    testImplementation(libs.robolectric)
     testImplementation(libs.mockito.core)
 
     androidTestImplementation(libs.ext.junit)
