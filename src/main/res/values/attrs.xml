@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="CustomCalendar">
+        <!-- Calendar appearance -->
+        <attr name="calendarDaySelectedColor" format="color" />
+        <attr name="calendarDaySelectedBackground" format="reference" />
+        <attr name="calendarDisplayDelimiters" format="boolean" />
+<!--        <attr name="calendarDayTextColor" format="color" />-->
+<!--        <attr name="calendarDayTextSize" format="dimension" />-->
+<!--        <attr name="calendarMonthTextColor" format="color" />-->
+<!--        <attr name="calendarMonthTextSize" format="dimension" />-->
+<!--        <attr name="calendarDayOfWeekTextColor" format="color" />-->
+<!--        <attr name="calendarDayOfWeekTextSize" format="dimension" />-->
+<!--        <attr name="calendarDayLayoutActiveResource" format="reference" />-->
+
+        <!-- Day TextView properties -->
+<!--        <attr name="calendarDayTvGravity" format="integer" />-->
+<!--        <attr name="calendarDayTvTextAlignment" format="integer" />-->
+<!--        <attr name="calendarDayTvColorActive" format="color" />-->
+<!--        <attr name="calendarDayTvColorInactive" format="color" />-->
+
+        <!-- You can add more attributes here as needed -->
+    </declare-styleable>
+</resources>
